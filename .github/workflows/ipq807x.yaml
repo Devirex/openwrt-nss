@@ -5,8 +5,7 @@ on: workflow_dispatch
 jobs:
     build:
         name: Prepare and build IPQ807x NSS generic images
-        runs-on: self-hosted
-
+        runs-on: ubuntu-latest
         steps:
             - name: Checkout
               uses: actions/checkout@v6.0.2
@@ -45,23 +44,26 @@ jobs:
                 uci commit system
                 EOF
 
-            - name: Download package sources
-              run: make download V=s
+            - name: Build
+              run: make -j4 V=s 
+            
+            # - name: Download package sources
+            #   run: make download V=s
 
-            - name: Build tools
-              run: |
-                make tools/install -j$(nproc) V=s || \
-                make tools/install V=s
+            # - name: Build tools
+            #   run: |
+            #     make tools/install -j$(nproc) V=s || \
+            #     make tools/install V=s
 
-            - name: Build toolchain
-              run: |
-                make toolchain/install -j$(nproc) V=s || \
-                make toolchain/install V=s
+            # - name: Build toolchain
+            #   run: |
+            #     make toolchain/install -j$(nproc) V=s || \
+            #     make toolchain/install V=s
 
-            - name: Build target images
-              run: |
-                make -j$(nproc) V=s || \
-                make V=s
+            # - name: Build target images
+            #   run: |
+            #     make -j$(nproc) V=s || \
+            #     make V=s
 
     release:
         name: Make a release
@@ -85,6 +87,7 @@ jobs:
                 artifacts: bin/targets/qualcommax/ipq807x/*
                 token: "${{ secrets.GITHUB_TOKEN }}"
 
+<<<<<<< HEAD
             - name: Clone OpenWRT Data Repo and push new data
               run: |
                 git clone https://x-access-token:${{ secrets.DESTINATION_TOKEN }}@github.com/AgustinLorenzo/openwrtdata.git dest-repo
@@ -123,3 +126,6 @@ jobs:
                     git commit -m "Uploading the rest of the packages and refreshing the index"
                     git push origin main
                 fi
+=======
+            
+>>>>>>> a2340dc908f (Update Add my changes)

@@ -1,0 +1,22 @@
+#!/bin/sh /etc/rc.common
+
+START=27
+
+DEPEND() {
+    need qca-nss-ecm
+}
+
+start() {
+    if lsmod | grep ecm > /dev/null 2>&1; then
+        logger -p daemon.notice -t reload-nfconntrack "module qca-nss-ecm loaded"
+        if lsmod | grep nf_conntrack_netlink > /dev/null 2>&1; then
+            logger -p daemon.notice -t reload-nfconntrack "reload nf_conntrack_netlink"
+            rmmod nf_conntrack_netlink
+            modprobe nf_conntrack_netlink
+        fi
+    fi
+}
+
+stop() {
+    :
+}
