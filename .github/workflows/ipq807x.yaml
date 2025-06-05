@@ -5,8 +5,7 @@ on: workflow_dispatch
 jobs:
     build:
         name: Prepare and build IPQ807x NSS generic images
-        runs-on: self-hosted
-
+        runs-on: ubuntu-latest
         steps:
             - name: Checkout
               uses: actions/checkout@v4
@@ -40,23 +39,26 @@ jobs:
                 uci commit
                 EOF
 
-            - name: Download package sources
-              run: make download V=s
+            - name: Build
+              run: make -j4 V=s 
+            
+            # - name: Download package sources
+            #   run: make download V=s
 
-            - name: Build tools
-              run: |
-                make tools/install -j$(nproc) V=s || \
-                make tools/install V=s
+            # - name: Build tools
+            #   run: |
+            #     make tools/install -j$(nproc) V=s || \
+            #     make tools/install V=s
 
-            - name: Build toolchain
-              run: |
-                make toolchain/install -j$(nproc) V=s || \
-                make toolchain/install V=s
+            # - name: Build toolchain
+            #   run: |
+            #     make toolchain/install -j$(nproc) V=s || \
+            #     make toolchain/install V=s
 
-            - name: Build target images
-              run: |
-                make -j$(nproc) V=s || \
-                make V=s
+            # - name: Build target images
+            #   run: |
+            #     make -j$(nproc) V=s || \
+            #     make V=s
 
             - name: Get the current date
               run: |
@@ -74,16 +76,4 @@ jobs:
                 artifacts: bin/targets/qualcommax/ipq807x/*
                 token: "${{ secrets.GITHUB_TOKEN }}"
 
-            - name: Clone OpenWRT Data Repo and push new data
-              run: |
-                git clone https://x-access-token:${{ secrets.DESTINATION_TOKEN }}@github.com/AgustinLorenzo/openwrtdata.git dest-repo
-                mkdir -p dest-repo/data/nss-wifi/${{ env.NOWWEB }}
-                rsync -av --delete --exclude='.git' bin/targets/qualcommax/ipq807x/* dest-repo/data/nss-wifi/${{ env.NOWWEB }}/
-                cd dest-repo
-                git add .
-                if git diff --cached --quiet; then
-                    echo "No hay cambios para subir"
-                else
-                    git commit -m "Sync desde ${{ github.repository }}:$(date +'%Y-%m-%d %H:%M:%S')"
-                    git push origin main
-                fi
+            
