@@ -45,6 +45,7 @@ jobs:
 
             - name: Build tools
               run: |
+                pip install netifaces
                 make tools/install -j$(nproc) V=s || \
                 make tools/install V=s
 
